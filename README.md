@@ -11,7 +11,7 @@ FASTQC tool is used for the quality control of fastq files. If base quality and 
 ~$ cutadapt -a forward_adapter_sequence -A reverse_adapter_sequence -o out.1.fastq -p out.2.fastq reads.1.fastq reads.2.fastq (paired-end trimming). In here, -a argument corresponds forward adapter sequences, -A argument corresponds reverse adapter sequences, -o argument corresponds output file (adapter trimmed fastq file), and -p argument corresponds paired-end mode. 
 In the single-end trimming, ~$ cutadapt -a AACCGGTT -o output.fastq input.fastq or  cutadapt -g AACCGGTT -o output.fastq input.fastq. Cutadapt -a argument corresponds 3' adapter sequences, however -g corresponds 5' adapter sequences. Thus, overrepresent (contaminant) adapter sequences are removed by using cutadapt tool like examples above.
 
-# Alignment Process (Step 2)
+# Alignment process (Step 2)
 
 Each read in FASTQ files is aligned to reference genome to fit them to one or more genomic coordinates (namely, relevant genes). This step is achieved by several tools such as HISAT2, TopHat, so on. Refence genome is indexed by using aligners before aligment step. The purpose of reference genome index is sorting of genomic coordinates and this reduces alignment-process timing. We are utilizing HISAT2 aligner tool to make aligment process in here.
 
@@ -39,7 +39,7 @@ The meaning of the arguments:
 
 -S argument: This argument is used for generation of SAM files.
 
-# The file conversion (Step 3)
+# File conversion (Step 3)
 
 In this step, SAM files are converted to BAM files by using Samtools. BAM files have less storage-load than SAM files and they can be thought as the compressed SAM files.
 
