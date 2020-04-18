@@ -82,9 +82,46 @@ After gene-level quantification, the expression matrix is look like below:
 | Gene_2  | 30  | 40  |  50  | 60
 | Gene_3  | 100  | 120  |  130  | 95
 
+# Differential expression analysis with DESeq2
+
+After finishing of gene-level quantification, expression matrix is read in R computing environment to carry out differential expression analysis. Differential expression workflow is showed in below:
+
+featureCounts_expression_matrix=read.delim("featureCounts_expression_matrix", header = T, row.names = 1) # reading of expression matrix in R.
+
+head(featureCounts_FIZM011_read_counts) # Looking at first six rows of expression matrix.
+
+expression_matrix_assignment=as.matrix(featureCounts_expression_matrix) # DESeq2 recognizes matrix data instead of list or data.frame, so our expression data must be assigned as a matrix.
+
+storage.mode(expression_matrix)="numeric" # DESeq2 recognizes matrices at numeric-type, so our matrix must be assigned as the numeric.
+
+To understand whether our data is both matrix and numeric or not:
+typeof(), class(), str() functions can be used for this purpose. 
 
 
+groups <- factor(c(rep("Controls",2),rep("Patients",2))) # Each sample group is assigned as the factor to make trait (phenotype) annotation. The first two columns of expression data are control groups, but last two columns are patient groups.
 
+groups # Controlling of sample annotation. This step is very critical because If groups are assigned as the wrong, then differentially expressed genes between groups are gonna be wrong.
+
+min_read <- 1 # Row-wise filtration is performed in expression data to eliminate genes with low expression across samples. Low expressed genes might cause statistical noise and this might create a bias in result of analysis.
+
+FIZM011_filtered_read_counts <- matrix_ataması[apply(matrix_ataması,1,function(x){max(x)}) > min_read,] #### >1 şeklinde filtreleme yapıldı.
+
+sampleInfo <- data.frame(groups,row.names=colnames(FIZM011_filtered_read_counts))
+
+dds <- DESeqDataSetFromMatrix(countData = FIZM011_filtered_read_counts, colData = sampleInfo, design = ~ groups)
+
+dds$groups = relevel(dds$groups,"Controls")
+
+dds <- DESeq(dds)
+
+res <- results(dds,independentFiltering=F)
+
+write.csv(res, file="FIZM011_DESeq2_differential_expression_results_tümm_genlerr.csv", quote=F)
+
+resSig <- res[(!is.na(res$padj) & (res$padj <= 0.05) & (abs(res$log2FoldChange)>= 1.5)), ]
+
+write.csv(resSig, file="FIZM011_DESeq2_differential_expression_results_significant_genes.csv", quote=F)
+head(res)
 
 
 
