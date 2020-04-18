@@ -73,8 +73,13 @@ The meaning of arguments:
 
 --verbose argument: Output verbose information for debugging, such as un-matched chromosome/contig names. During running analysis, information about process is simultaneously showed in the same window.
 
+After gene-level quantification, the expression matrix is look like below:
 
 
+| First Header  | Second Header |
+| ------------- | ------------- |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
 
 
 
