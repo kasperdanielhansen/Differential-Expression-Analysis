@@ -84,7 +84,7 @@ After gene-level quantification, the expression matrix is look like below:
 | Gene_2  | 30  | 40  |  50  | 60
 | Gene_3  | 100  | 120  |  130  | 95
 
-# Differential expression analysis with DESeq2
+# Differential expression analysis with DESeq2 (Step 5)
 
 After finishing of gene-level quantification, expression matrix is read in R computing environment to carry out differential expression analysis. Differential expression workflow is showed in below:
 
