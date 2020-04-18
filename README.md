@@ -35,7 +35,21 @@ The meaning of the arguments:
 
 -U argument: This argument is fitted for only single-end reads.
 
--S argument: 
+-S argument: This argument is used for generation of SAM files.
+
+# The file conversion (Step 3)
+
+In this step, SAM files are converted to BAM files by using Samtools. BAM files have less storage-load than SAM files and they can be thought as the compressed SAM files.
+
+~$ samtools sort -@ 6 -o file.bam file.sam
+
+The meaning of the arguments:
+
+sort argument: SAM files are sorted by genomic coordinates or names. The sorting based on genomic coordinates or names is performed according to purpose of downstream analysis. 
+
+-@ argument: The number of threads.
+
+-o argument: This argument is used for generation of files with .bam extension.
 
 
 
