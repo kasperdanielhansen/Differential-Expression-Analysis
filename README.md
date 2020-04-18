@@ -107,28 +107,35 @@ groups # Controlling of sample annotation. This step is very critical because If
 Filtration of genes with low expression:
 
 min_read <- 1 
-filtered_expression_data <- expression_matrix[apply(expression_matrix,1,function(x){max(x)}) > min_read,]
-
-## Row-wise filtration is performed in expression data to eliminate genes with low expression across samples. Low expressed genes might cause statistical noise and this might create a bias in result of analysis.
+filtered_expression_data <- expression_matrix[apply(expression_matrix,1,function(x){max(x)}) > min_read,] # Row-wise filtration is performed in expression data to eliminate genes with low expression across samples. Low expressed genes might cause statistical noise and this might create a bias in result of analysis.
 
 ------------------------------------------------------------------------------------------------------
 
-sampleInfo <- data.frame(groups,row.names=colnames(FIZM011_filtered_read_counts))
+sampleInfo <- data.frame(groups,row.names=colnames(filtered_expression_data)) # Sample-trait annotation step.
 
-dds <- DESeqDataSetFromMatrix(countData = FIZM011_filtered_read_counts, colData = sampleInfo, design = ~ groups)
+------------------------------------------------------------------------------------------------------
+
+Differential expression analysis:
+
+dds <- DESeqDataSetFromMatrix(countData = filtered_expression_data, colData = sampleInfo, design = ~ groups)
 
 dds$groups = relevel(dds$groups,"Controls")
 
 dds <- DESeq(dds)
 
-res <- results(dds,independentFiltering=F)
+res <- results(dds,independentFiltering=F) # In this step, statistical analysis results are avaiable for all genes, but statistical meaningful and non-meaningful results are together.
 
-write.csv(res, file="FIZM011_DESeq2_differential_expression_results_tümm_genlerr.csv", quote=F)
+To select only statistical meaningful results:
 
-resSig <- res[(!is.na(res$padj) & (res$padj <= 0.05) & (abs(res$log2FoldChange)>= 1.5)), ]
+resSig <- res[(!is.na(res$padj) & (res$padj <= 0.05) & (abs(res$log2FoldChange)>= 1.5)), ] # In here, genes were selected with both adjusted p-value <=0.05 and log2FoldChange >=1.5. As the results, we obtained both statistical and biologically meaningful differentially expressed genes between patients and controls.
 
-write.csv(resSig, file="FIZM011_DESeq2_differential_expression_results_significant_genes.csv", quote=F)
-head(res)
+To write results to our computer from R computing environment:
+
+write.csv(resSig, file="differential_expression_results_significant_genes.csv", quote=F)
+
+
+-------------------------------------------------------- The End --------------------------------------------------------
+
 
 
 
