@@ -76,7 +76,7 @@ The meaning of arguments:
 After gene-level quantification, the expression matrix is look like below:
 
 
-| First Header  | Second Header | Third Header  | Fourth Header  |
+| Control_1  | Control_2 | Patient_1  | Patient_2  |
 | ------------- | ------------- | ------------- | -------------  |
 | Content Cell  | Content Cell  | Content Cell  |  Content Cell  |
 | Content Cell  | Content Cell  | Content Cell  |  Content Cell  |
