@@ -78,8 +78,9 @@ After gene-level quantification, the expression matrix is look like below:
 
 |   | Control_1 | Control_2  | Patient_1  | Patient_2  |  
 | ------------- | ------------- | ------------- | -------------  | ------------- 
-| Content Cell  | Content Cell  | Content Cell  |  Content Cell  | Content Cell
-| Content Cell  | Content Cell  | Content Cell  |  Content Cell  | Content Cell
+| Gene_1  | 3  | 5  |  7  | 9
+| Gene_2  | 30  | 40  |  50  | 60
+| Gene_3  | 100  | 120  |  130  | 95
 
 
 
