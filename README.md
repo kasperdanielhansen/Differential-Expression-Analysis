@@ -133,6 +133,8 @@ To write results to our computer from R computing environment:
 
 write.csv(resSig, file="differential_expression_results_significant_genes.csv", quote=F)
 
+Obtained file with .csv extension looks like below:
+
 
 |   | baseMean | log2FoldChange  | IfcSE  | stat  | pvalue | padj 
 | ------------- | ------------- | ------------- | -------------  | ------------- | ------------- | -------------
