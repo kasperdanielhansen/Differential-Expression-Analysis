@@ -51,6 +51,14 @@ sort argument: SAM files are sorted by genomic coordinates or names. The sorting
 
 -o argument: This argument is used for generation of files with .bam extension.
 
+# Gene-level quantification (Step 4)
+
+All transcripts belonging to each gene are quantified across samples by using the featureCounts tool and this is made with bam files. After quantification, featureCounts generates an expression matrix in which each column represents individual sample, but each row represents individual gene.
+
+~$ featureCounts patient1.bam patient2.bam control1.bam control2.bam -a annotation_file.gtf -o names_of_output_file -g gene_id -T 6 -s 2 -Q 50 --verbose
+
+The meaning of arguments:
+
 
 
 
