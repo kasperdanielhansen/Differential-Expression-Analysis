@@ -1,3 +1,5 @@
+
+
 # Differential-Expression-Analysis
 
 We assume that there are fastq files (raw sequences) in our hand. If not, you can visit this https://www.ncbi.nlm.nih.gov/books/NBK242621/ website address to download fastq files from NCBI/SRA. For installation of SRA toolkit: https://ncbi.github.io/sra-tools/install_config.html.
@@ -142,17 +144,9 @@ Obtained file with .csv extension looks like below:
 | Gene_2  | 98.2824885614715  | 2.15753251459839  |  0.60573737089831  | 3.56182830753658  | 0.00036828120481343  | 0.00214459983313731 
 | Gene_3  | 412.438051846698  | 2.18571599360682  |  0.231625110250678  | 6.86459918229613  | 0.00000000000666782010218906   | 0.000000000218449038969323 
 
+If you desire more detalied workflow of DESeq2, can visit https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html website.
+
+Best wishes.
 
 -------------------------------------------------------- The End --------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
 
