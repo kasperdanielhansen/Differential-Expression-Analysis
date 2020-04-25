@@ -2,15 +2,15 @@
 
 # Differential-Expression-Analysis
 
-We assume that there are fastq files (raw sequences) in our hand. If not, you can visit this https://www.ncbi.nlm.nih.gov/books/NBK242621/ website address to download fastq files from NCBI/SRA. For installation of SRA toolkit: https://ncbi.github.io/sra-tools/install_config.html.
+We assume that we have FASTQ files (raw sequences). If not, you can visit this https://www.ncbi.nlm.nih.gov/books/NBK242621/ website address to download FASTQ files from NCBI/SRA. For installation of SRA toolkit: https://ncbi.github.io/sra-tools/install_config.html.
 
-# Quality control of fastq files (Step 1)
+# Quality control of FASTQ files (Step 1)
 
-FASTQC tool is used for the quality control of fastq files. If base quality and adapter context are good, we can pass to further step, however, ıf not, bases with poor quality are removed from fastq files to reduce technical bias of RNA-seq analysis. To remove those bases, cutadapt is useful tool. We assume that our fastq files have a lot of adapter sequences (synthetic sequences) and so we want to remove them.
+FASTQC tool is used for the quality control of FASTQ files. If base quality and adapter context are good, we can pass to next step, however, ıf not, bases with poor quality are removed to reduce technical bias of RNA-seq analysis. To remove those bases, cutadapt tool is used. We assume that our FASTQ files have a lot of adapter sequences (synthetic sequences) and so we want to remove them.
 
 ------------------------------------------------------------------------------------------------------
 
-For paired-end trimming:
+For paired-end FASTQ files:
 
 ~$ cutadapt -a forward_adapter_sequence -A reverse_adapter_sequence -o out.1.fastq -p out.2.fastq reads.1.fastq reads.2.fastq 
 
@@ -21,21 +21,25 @@ The meanings of arguments:
 -o argument: This argument corresponds output file (adapter trimmed fastq file)
 -p argument: This argument corresponds paired-end mode.
 
+reads.1.fastq and reads.2.fastq file are input paired-end files, but out.1.fastq and out.2.fastq files are output files (trimmed fastq files).
+
+Adapter sequences such as  ATCCGGAT and TTCGATCGA can be written for -a and -A arguments, respectively.
+
 ------------------------------------------------------------------------------------------------------
 
-For single-end trimming:
+For single-end FASTQ files:
 
-~$ cutadapt -a AACCGGTT -o output.fastq input.fastq or  cutadapt -g AACCGGTT -o output.fastq input.fastq. 
+~$ cutadapt -a AACCGGTT -o output.fastq input.fastq or cutadapt -g AACCGGTT -o output.fastq input.fastq. 
 
 The meanings of arguments:
 -a argument corresponds 3' adapter sequences.
 -g argument: corresponds 5' adapter sequences. 
 
-Thus, overrepresent (contaminant) adapter sequences are removed by using cutadapt tool like examples above.
+Thus, overrepresent (contaminant) adapter sequences are removed by using cutadapt tool for both single and paired-end FASTQ files.
 
 # Alignment process (Step 2)
 
-Each read in FASTQ files is aligned to reference genome to fit them to one or more genomic coordinates (namely, relevant genes). This step is achieved by several tools such as HISAT2, TopHat, so on. Refence genome is indexed by using aligners before aligment step. The purpose of reference genome index is sorting of genomic coordinates and this reduces alignment-process timing. We are utilizing HISAT2 aligner tool to make aligment process in here.
+In this step, trimmed (cleaned) FASTQ files are used. Each read in FASTQ files is aligned to reference genome to fit them to one or more genomic coordinates (namely, relevant genes). This step is achieved by several tools such as HISAT2, TopHat, so on. Refence genome is indexed by using aligners before aligment step. The purpose of reference genome index is sorting of genomic coordinates and this reduces alignment-process timing. We are utilizing HISAT2 aligner tool for index and alingment processes in here.
 
 Reference genome indexing:
 
@@ -45,15 +49,15 @@ Reference genome indexing:
 
 Aligment examples with HISAT2:
 
-~$ hisat2 --dta -p --rna-strandness R -x reference_genome_indexes -U input.fastq -S output.sam 
+~$ hisat2 --dta -p 4 --rna-strandness R -x reference_genome_indexes -U input.fastq -S output.sam 
 
 The meaning of the arguments:
 
 --dta argument: Report alignments tailored for transcript assemblers including StringTie. With this option, HISAT2 requires longer anchor lengths for de novo discovery of splice sites. This leads to fewer alignments with short-anchors, which helps transcript assemblers improve significantly in computation and memory usage.
 
--p argument: Launch NTHREADS parallel search threads (default: 1). Threads will run on separate processors/cores and synchronize when parsing reads and outputting alignments.
+-p argument: Launch NTHREADS parallel search threads (default: 1). Threads will run on separate processors/cores and synchronize when parsing reads and outputting alignments. We used 4 cores in here.
 
---rna-strandness argument: Specify strand-specific information: the default is unstranded. For single-end reads, use F or R. 'F' means a read corresponds to a transcript. 'R' means a read corresponds to the reverse complemented counterpart of a transcript. For paired-end reads, use either FR or RF.
+--rna-strandness argument: Specify strand-specific information: the default is unstranded. For single-end reads, use F or R. 'F' means a read corresponds to a transcript. 'R' means a read corresponds to the reverse complemented counterpart of a transcript. For paired-end reads, use either FR or RF. We used 'R' argument for first-strand format FASTQ files, which means that our reads correspond to reverse complemented of transcripts. If our FASTQ files are second-strand format, then we should use 'F' argument instead of 'R' argument.
 
 -x argument: The basename of the index for the reference genome.
 
