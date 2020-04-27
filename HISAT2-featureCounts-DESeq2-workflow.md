@@ -197,7 +197,8 @@ Obtained file with .csv extension looks like below:
 
 If you desire more detailed workflow, can visit https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html website.
 
-Thanks your interest!
+Thanks for your interest!
+
 Best wishes :)
 
 -------------------------------------------------------- The End --------------------------------------------------------
