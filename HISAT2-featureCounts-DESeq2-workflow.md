@@ -51,6 +51,8 @@ Aligment examples with HISAT2:
 
 ~$ hisat2 --dta -p 4 --rna-strandness R -x reference_genome_indexes -U input.fastq -S output.sam 
 
+------------------------------------------------------------------------------------------------------
+
 The meaning of the arguments:
 
 --dta argument: Report alignments tailored for transcript assemblers including StringTie. With this option, HISAT2 requires longer anchor lengths for de novo discovery of splice sites. This leads to fewer alignments with short-anchors, which helps transcript assemblers improve significantly in computation and memory usage.
@@ -71,6 +73,8 @@ In this step, SAM files are converted to BAM files by using Samtools. BAM files 
 
 ~$ samtools sort -@ 6 -o file.bam file.sam
 
+------------------------------------------------------------------------------------------------------
+
 The meaning of the arguments:
 
 sort argument: SAM files are sorted by genomic coordinates or names. The sorting based on genomic coordinates or names is performed according to purpose of downstream analysis. 
@@ -84,6 +88,8 @@ sort argument: SAM files are sorted by genomic coordinates or names. The sorting
 All transcripts belonging to each gene are quantified across samples by using the featureCounts tool and this is made with bam files. After quantification, featureCounts generates an expression matrix in which each column represents individual sample, but each row represents individual gene.
 
 ~$ featureCounts control1.bam control2.bam patient1.bam patient2.bam -a annotation_file.gtf -o names_of_output_file -g gene_id -T 6 -s 2 -Q 50 --verbose
+
+------------------------------------------------------------------------------------------------------
 
 The meaning of arguments:
 
@@ -100,6 +106,8 @@ The meaning of arguments:
 -Q argument: This argument filters transcripts with low mapping quality score. If mapping quality is low, it means that the same transcipt may be aligned to at least two (or more) genomics coordinates (namely, genes) and this contributes to wrong gene-level quantification.
 
 --verbose argument: Output verbose information for debugging, such as un-matched chromosome/contig names. During running analysis, information about process is simultaneously shown in the same window in which analysis run.
+
+------------------------------------------------------------------------------------------------------
 
 After gene-level quantification, the expression matrix looks like below:
 
@@ -119,11 +127,15 @@ expression matrix in R.
 
 head(featureCounts_expression_matrix) # Looking at first six rows of expression matrix.
 
+------------------------------------------------------------------------------------------------------
+
 expression_matrix_assignment=as.matrix(featureCounts_expression_matrix) # DESeq2 recognizes matrix data instead of list or data.frame, so our expression data must be assigned as a matrix.
 
 class(expression_matrix_assignment) # Controlling type of our expression data (Its matrix or not?)
 typeof(expression_matrix_assignment) # Controlling type of our expression data (Its matrix or not?) If data is matrix then
 we can move on next steps.
+
+------------------------------------------------------------------------------------------------------
 
 storage.mode(expression_matrix_assignment)="numeric" # DESeq2 recognizes matrices at numeric-type, so our matrix must be assigned as the numeric.
 
@@ -131,6 +143,7 @@ apply(expression_matrix_assignment, 2, typeof) # Controlling type of our express
 
 If our expression data is both matrix format and numeric, we can move on other steps.
 
+------------------------------------------------------------------------------------------------------
 
 groups <- factor(c(rep("Controls",2),rep("Patients",2))) # Each sample group is assigned as the factor to make trait (phenotype) annotation. The first two columns of expression data are control groups, but last two columns are patient groups.
 
@@ -159,13 +172,19 @@ dds <- DESeq(dds)
 
 res <- results(dds,independentFiltering=F) # In this step, statistical analysis results are avaiable for all genes, but statistically meaningful and non-meaningful results are together.
 
+------------------------------------------------------------------------------------------------------
+
 To select only statistically meaningful results:
 
 resSig <- res[(!is.na(res$padj) & (res$padj <= 0.05) & (abs(res$log2FoldChange)>= 1.5)), ] # In here, genes were selected according to adjusted p-value <=0.05 and log2FoldChange >=1.5. As the results, we obtained both statistically and biologically meaningful differentially expressed genes between patients and controls.
 
+------------------------------------------------------------------------------------------------------
+
 To write results to computer from R statistical computing environment:
 
 write.csv(resSig, file="differential_expression_results_significant_genes.csv", quote=F)
+
+------------------------------------------------------------------------------------------------------
 
 Obtained file with .csv extension looks like below:
 
@@ -180,6 +199,8 @@ If you desire more detailed workflow, can visit https://bioconductor.org/package
 
 
 Best wishes :)
+
+------------------------------------------------------------------------------------------------------
 
 -------------------------------------------------------- The End --------------------------------------------------------
 
