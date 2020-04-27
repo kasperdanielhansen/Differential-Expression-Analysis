@@ -39,7 +39,7 @@ Thus, overrepresent (contaminant) adapter sequences are removed by using cutadap
 
 # Alignment process (Step 2)
 
-In this step, trimmed (cleaned) FASTQ files are used. Each read in FASTQ files is aligned to reference genome to fit them to one or more genomic coordinates (namely, relevant genes). This step is achieved by several tools such as HISAT2, TopHat, so on. Refence genome is indexed by using aligners before aligment step. The purpose of reference genome index is sorting of genomic coordinates and this reduces alignment-process timing. We are utilizing HISAT2 aligner tool for index and alignment processes here.
+In this step, trimmed (cleaned) FASTQ files are used. Each read in FASTQ files is aligned to reference genome to fit them to one or more genomic coordinates (namely, relevant genes). This step is achieved by several tools such as HISAT2, TopHat, so on. Refence genome is indexed by using aligners before alignment step. The purpose of reference genome index is sorting of genomic coordinates and this reduces alignment-process timing. We are utilizing HISAT2 aligner tool for index and alignment processes here.
 
 Reference genome indexing:
 
@@ -85,7 +85,7 @@ sort argument: SAM files are sorted by genomic coordinates or names. The sorting
 
 # Gene-level quantification (Step 4)
 
-All transcripts belonging to each gene are quantified across samples by using the featureCounts tool and this is made with bam files. After quantification, featureCounts generates an expression matrix in which each column represents individual sample, but each row represents individual gene.
+All transcripts belonging to each gene are quantified across samples by using the featureCounts tool and this is made with bam files. After quantification, featureCounts generate an expression matrix in which each column represents individual sample, but each row represents individual gene.
 
 ~$ featureCounts control1.bam control2.bam patient1.bam patient2.bam -a annotation_file.gtf -o names_of_output_file -g gene_id -T 6 -s 2 -Q 50 --verbose
 
