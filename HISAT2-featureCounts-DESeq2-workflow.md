@@ -6,7 +6,7 @@ We assume that we have FASTQ files (raw sequences). If not, you can visit this h
 
 # Quality control of FASTQ files (Step 1)
 
-FASTQC tool is used for the quality control of FASTQ files. If base quality and adapter context are good, we can pass to next step, however, ıf not, bases with poor quality are removed to reduce technical bias of RNA-seq analysis. To remove those bases, cutadapt tool is used. We assume that our FASTQ files have a lot of adapter sequences (synthetic sequences) and so we want to remove them.
+FASTQC tool is used for the quality control of FASTQ files. If base quality and adapter context are good, we can move on next step, however, ıf not, bases with poor quality are removed to reduce technical bias of RNA-seq analysis. To remove those bases, cutadapt tool is used. We assume that our FASTQ files have a lot of adapter sequences (synthetic sequences) and so we want to remove them.
 
 ------------------------------------------------------------------------------------------------------
 
