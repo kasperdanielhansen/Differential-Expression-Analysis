@@ -55,7 +55,7 @@ The meaning of the arguments:
 
 --dta argument: Report alignments tailored for transcript assemblers including StringTie. With this option, HISAT2 requires longer anchor lengths for de novo discovery of splice sites. This leads to fewer alignments with short-anchors, which helps transcript assemblers improve significantly in computation and memory usage.
 
--p argument: Launch NTHREADS parallel search threads (default: 1). Threads will run on separate processors/cores and synchronize when parsing reads and outputting alignments. We used 4 cores in here.
+-p argument: Launch NTHREADS parallel search threads (default: 1). Threads will run on separate processors/cores and synchronize when parsing reads and outputting alignments. We used four cores in here.
 
 --rna-strandness argument: Specify strand-specific information: the default is unstranded. For single-end reads, use F or R. 'F' means a read corresponds to a transcript. 'R' means a read corresponds to the reverse complemented counterpart of a transcript. For paired-end reads, use either FR or RF. We used 'R' argument for first-strand format FASTQ files, which means that our reads correspond to reverse complemented of transcripts. If our FASTQ files are second-strand format, then we should use 'F' argument instead of 'R' argument.
 
@@ -75,7 +75,7 @@ The meaning of the arguments:
 
 sort argument: SAM files are sorted by genomic coordinates or names. The sorting based on genomic coordinates or names is performed according to purpose of downstream analysis. 
 
--@ argument: The number of threads.
+-@ argument: The number of threads. We used six cores in here.
 
 -o argument: This argument is used for generation of files with .bam extension.
 
@@ -83,7 +83,7 @@ sort argument: SAM files are sorted by genomic coordinates or names. The sorting
 
 All transcripts belonging to each gene are quantified across samples by using the featureCounts tool and this is made with bam files. After quantification, featureCounts generates an expression matrix in which each column represents individual sample, but each row represents individual gene.
 
-~$ featureCounts patient1.bam patient2.bam control1.bam control2.bam -a annotation_file.gtf -o names_of_output_file -g gene_id -T 6 -s 2 -Q 50 --verbose
+~$ featureCounts control1.bam control2.bam patient1.bam patient2.bam -a annotation_file.gtf -o names_of_output_file -g gene_id -T 6 -s 2 -Q 50 --verbose
 
 The meaning of arguments:
 
@@ -93,15 +93,15 @@ The meaning of arguments:
 
 -g argument: This argument is used for gene-level quantification.
 
--T: This argument determines the number of threads.
+-T: This argument determines the number of threads. We used six core in here again.
 
--s argument: This argument assings strandness information. If it is used as the wrong then each transcript is quantified for wrong a gene and this effects downstream analysis results.
+-s argument: This argument assings strandness information. If it is used as the wrong then transcripts can be assigned to wrong a gene and this effects downstream analysis results. We selected reversely stranded option (namely, -s 2) because we have first-stranded FASTQ files.
 
--Q argument: This argument filters transcripts with low mapping quality score. If mapping quality is low, it means that the same transcipt is aligned to at least two (or more) genomics coordinates (namely, genes) and this contributes to wrong gene-level quantification.
+-Q argument: This argument filters transcripts with low mapping quality score. If mapping quality is low, it means that the same transcipt may be aligned to at least two (or more) genomics coordinates (namely, genes) and this contributes to wrong gene-level quantification.
 
---verbose argument: Output verbose information for debugging, such as un-matched chromosome/contig names. During running analysis, information about process is simultaneously showed in the same window.
+--verbose argument: Output verbose information for debugging, such as un-matched chromosome/contig names. During running analysis, information about process is simultaneously shown in the same window in which analysis run.
 
-After gene-level quantification, the expression matrix is look like below:
+After gene-level quantification, the expression matrix looks like below:
 
 
 |   | Control_1 | Control_2  | Patient_1  | Patient_2  |  
@@ -112,30 +112,36 @@ After gene-level quantification, the expression matrix is look like below:
 
 # Differential expression analysis with DESeq2 (Step 5)
 
-After finishing of gene-level quantification, expression matrix is read in R computing environment to carry out differential expression analysis. Differential expression workflow is showed in below:
+After finishing of gene-level quantification, expression matrix is read in R statistical computing environment to carry out differential expression analysis steps. Differential expression workflow is shown below:
 
-featureCounts_expression_matrix=read.delim("featureCounts_expression_matrix", header = T, row.names = 1) # reading of expression matrix in R.
+featureCounts_expression_matrix=read.delim("featureCounts_expression_matrix", header = T, row.names = 1) # reading
+expression matrix in R.
 
-head(featureCounts_FIZM011_read_counts) # Looking at first six rows of expression matrix.
+head(featureCounts_expression_matrix) # Looking at first six rows of expression matrix.
 
 expression_matrix_assignment=as.matrix(featureCounts_expression_matrix) # DESeq2 recognizes matrix data instead of list or data.frame, so our expression data must be assigned as a matrix.
 
-storage.mode(expression_matrix)="numeric" # DESeq2 recognizes matrices at numeric-type, so our matrix must be assigned as the numeric.
+class(expression_matrix_assignment) # Controlling type of our expression data (Its matrix or not?)
+typeof(expression_matrix_assignment) # Controlling type of our expression data (Its matrix or not?) If data is matrix then
+we can move on next steps.
 
-To understand whether our data is both matrix and numeric or not:
-typeof(), class(), str() functions can be used for this purpose. 
+storage.mode(expression_matrix_assignment)="numeric" # DESeq2 recognizes matrices at numeric-type, so our matrix must be assigned as the numeric.
+
+apply(expression_matrix_assignment, 2, typeof) # Controlling type of our expression data (Its numeric or not?)
+
+If our expression data is both matrix format and numeric, we can move on other steps.
 
 
 groups <- factor(c(rep("Controls",2),rep("Patients",2))) # Each sample group is assigned as the factor to make trait (phenotype) annotation. The first two columns of expression data are control groups, but last two columns are patient groups.
 
-groups # Controlling of sample annotation. This step is very critical because If groups are assigned as the wrong, then differentially expressed genes between groups are gonna be wrong.
+head(groups) # Controlling sample annotation. This step is very critical because If groups are assigned as the wrong, then differentially expressed gene results between groups could be wrong.
 
 ------------------------------------------------------------------------------------------------------
 
 Filtration of genes with low expression:
 
 min_read <- 1 
-filtered_expression_data <- expression_matrix[apply(expression_matrix,1,function(x){max(x)}) > min_read,] # Row-wise filtration is performed in expression data to eliminate genes with low expression across samples. Low expressed genes might cause statistical noise and this might create a bias in result of analysis.
+filtered_expression_data <- expression_matrix_assignment[apply(expression_matrix_assignment,1,function(x){max(x)}) > min_read,] # Row-wise filtration is performed in expression data to eliminate genes with low expression across samples. Low expressed genes may cause statistical noise and create a bias in results.
 
 ------------------------------------------------------------------------------------------------------
 
@@ -151,13 +157,13 @@ dds$groups = relevel(dds$groups,"Controls")
 
 dds <- DESeq(dds)
 
-res <- results(dds,independentFiltering=F) # In this step, statistical analysis results are avaiable for all genes, but statistical meaningful and non-meaningful results are together.
+res <- results(dds,independentFiltering=F) # In this step, statistical analysis results are avaiable for all genes, but statistically meaningful and non-meaningful results are together.
 
-To select only statistical meaningful results:
+To select only statistically meaningful results:
 
-resSig <- res[(!is.na(res$padj) & (res$padj <= 0.05) & (abs(res$log2FoldChange)>= 1.5)), ] # In here, genes were selected with both adjusted p-value <=0.05 and log2FoldChange >=1.5. As the results, we obtained both statistical and biologically meaningful differentially expressed genes between patients and controls.
+resSig <- res[(!is.na(res$padj) & (res$padj <= 0.05) & (abs(res$log2FoldChange)>= 1.5)), ] # In here, genes were selected according to adjusted p-value <=0.05 and log2FoldChange >=1.5. As the results, we obtained both statistically and biologically meaningful differentially expressed genes between patients and controls.
 
-To write results to our computer from R computing environment:
+To write results to computer from R statistical computing environment:
 
 write.csv(resSig, file="differential_expression_results_significant_genes.csv", quote=F)
 
@@ -170,9 +176,10 @@ Obtained file with .csv extension looks like below:
 | Gene_2  | 98.2824885614715  | 2.15753251459839  |  0.60573737089831  | 3.56182830753658  | 0.00036828120481343  | 0.00214459983313731 
 | Gene_3  | 412.438051846698  | 2.18571599360682  |  0.231625110250678  | 6.86459918229613  | 0.00000000000666782010218906   | 0.000000000218449038969323 
 
-If you desire more detalied workflow of DESeq2, can visit https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html website.
+If you desire more detailed workflow, can visit https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html website.
 
-Best wishes.
+
+Best wishes :)
 
 -------------------------------------------------------- The End --------------------------------------------------------
 
