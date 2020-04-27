@@ -16,10 +16,10 @@ For paired-end FASTQ files:
 
 The meanings of arguments:
 
--a argument: This argument corresponds forward adapter sequences.
--A argument: This argument corresponds reverse adapter sequences.
--o argument: This argument corresponds output file (adapter trimmed fastq file)
--p argument: This argument corresponds paired-end mode.
+-a argument: This argument corresponds to forward adapter sequences.
+-A argument: This argument corresponds to reverse adapter sequences.
+-o argument: This argument corresponds to output file (adapter trimmed fastq file)
+-p argument: This argument corresponds to paired-end mode.
 
 reads.1.fastq and reads.2.fastq file are input paired-end files, but out.1.fastq and out.2.fastq files are output files (trimmed fastq files).
 
@@ -32,14 +32,14 @@ For single-end FASTQ files:
 ~$ cutadapt -a AACCGGTT -o output.fastq input.fastq or cutadapt -g AACCGGTT -o output.fastq input.fastq. 
 
 The meanings of arguments:
--a argument corresponds 3' adapter sequences.
--g argument: corresponds 5' adapter sequences. 
+-a argument corresponds to 3' adapter sequences.
+-g argument: corresponds to 5' adapter sequences. 
 
 Thus, overrepresent (contaminant) adapter sequences are removed by using cutadapt tool for both single and paired-end FASTQ files.
 
 # Alignment process (Step 2)
 
-In this step, trimmed (cleaned) FASTQ files are used. Each read in FASTQ files is aligned to reference genome to fit them to one or more genomic coordinates (namely, relevant genes). This step is achieved by several tools such as HISAT2, TopHat, so on. Refence genome is indexed by using aligners before aligment step. The purpose of reference genome index is sorting of genomic coordinates and this reduces alignment-process timing. We are utilizing HISAT2 aligner tool for index and alingment processes in here.
+In this step, trimmed (cleaned) FASTQ files are used. Each read in FASTQ files is aligned to reference genome to fit them to one or more genomic coordinates (namely, relevant genes). This step is achieved by several tools such as HISAT2, TopHat, so on. Refence genome is indexed by using aligners before aligment step. The purpose of reference genome index is sorting of genomic coordinates and this reduces alignment-process timing. We are utilizing HISAT2 aligner tool for index and alignment processes here.
 
 Reference genome indexing:
 
@@ -57,7 +57,7 @@ The meaning of the arguments:
 
 --dta argument: Report alignments tailored for transcript assemblers including StringTie. With this option, HISAT2 requires longer anchor lengths for de novo discovery of splice sites. This leads to fewer alignments with short-anchors, which helps transcript assemblers improve significantly in computation and memory usage.
 
--p argument: Launch NTHREADS parallel search threads (default: 1). Threads will run on separate processors/cores and synchronize when parsing reads and outputting alignments. We used four cores in here.
+-p argument: Launch NTHREADS parallel search threads (default: 1). Threads will run on separate processors/cores and synchronize when parsing reads and outputting alignments. We used four cores here.
 
 --rna-strandness argument: Specify strand-specific information: the default is unstranded. For single-end reads, use F or R. 'F' means a read corresponds to a transcript. 'R' means a read corresponds to the reverse complemented counterpart of a transcript. For paired-end reads, use either FR or RF. We used 'R' argument for first-strand format FASTQ files, which means that our reads correspond to reverse complemented of transcripts. If our FASTQ files are second-strand format, then we should use 'F' argument instead of 'R' argument.
 
@@ -79,7 +79,7 @@ The meaning of the arguments:
 
 sort argument: SAM files are sorted by genomic coordinates or names. The sorting based on genomic coordinates or names is performed according to purpose of downstream analysis. 
 
--@ argument: The number of threads. We used six cores in here.
+-@ argument: The number of threads. We used six cores here.
 
 -o argument: This argument is used for generation of files with .bam extension.
 
@@ -99,7 +99,7 @@ The meaning of arguments:
 
 -g argument: This argument is used for gene-level quantification.
 
--T: This argument determines the number of threads. We used six core in here again.
+-T: This argument determines the number of threads. We used six core here again.
 
 -s argument: This argument assings strandness information. If it is used as the wrong then transcripts can be assigned to wrong a gene and this effects downstream analysis results. We selected reversely stranded option (namely, -s 2) because we have first-stranded FASTQ files.
 
@@ -176,7 +176,7 @@ res <- results(dds,independentFiltering=F) # In this step, statistical analysis 
 
 To select only statistically meaningful results:
 
-resSig <- res[(!is.na(res$padj) & (res$padj <= 0.05) & (abs(res$log2FoldChange)>= 1.5)), ] # In here, genes were selected according to adjusted p-value <=0.05 and log2FoldChange >=1.5. As the results, we obtained both statistically and biologically meaningful differentially expressed genes between patients and controls.
+resSig <- res[(!is.na(res$padj) & (res$padj <= 0.05) & (abs(res$log2FoldChange)>= 1.5)), ] # Here, genes were selected according to adjusted p-value <=0.05 and log2FoldChange >=1.5. As the results, we obtained both statistically and biologically meaningful differentially expressed genes between patients and controls.
 
 ------------------------------------------------------------------------------------------------------
 
