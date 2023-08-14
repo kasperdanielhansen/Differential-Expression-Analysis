@@ -197,7 +197,7 @@ Obtained file with .csv extension looks like below:
 
 If you desire more detailed workflow, can visit https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html website.
 
-If you have any questions about this pipeline, you feel free to contact me via kaan.okay@msfr.ibg.edu.tr e-mail address.
+If you have any questions about this pipeline, you feel free to contact me via kao25@hi.is e-mail address.
 
 Thanks for your interest!
 
