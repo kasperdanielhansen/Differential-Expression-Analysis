@@ -2,7 +2,7 @@
 
 # Differential-Expression-Analysis
 
-We assume that we have FASTQ files (raw sequences). If not, you can visit this https://www.ncbi.nlm.nih.gov/books/NBK242621/ website address to download FASTQ files from NCBI/SRA. For installation of SRA toolkit: https://ncbi.github.io/sra-tools/install_config.html.
+We assume that we have FASTQ files (raw sequences). If not, you can visit this https://www.ncbi.nlm.nih.gov/books/NBK242621/ website address to download FASTQ files from NCBI/SRA. For installation of SRA toolkit: https://ncbi.github.io/sra-tools/install_config.html or https://erilu.github.io/python-fastq-downloader/.
 
 # Quality control of FASTQ files (Step 1)
 
