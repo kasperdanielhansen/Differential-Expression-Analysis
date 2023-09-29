@@ -200,6 +200,7 @@ Obtained file with .csv extension looks like below:
 # Draw PCA plot from featureCounts output based on log2 transformed expression values (Bonus)
 
 library(ggplot2)
+
 library(ggforce)
 
 1. Uploading featureCounts output into R environment
