@@ -195,6 +195,56 @@ Obtained file with .csv extension looks like below:
 | Gene_2  | 98.2824885614715  | 2.15753251459839  |  0.60573737089831  | 3.56182830753658  | 0.00036828120481343  | 0.00214459983313731 
 | Gene_3  | 412.438051846698  | 2.18571599360682  |  0.231625110250678  | 6.86459918229613  | 0.00000000000666782010218906   | 0.000000000218449038969323 
 
+------------------------------------------------------------------------------------------------------
+
+# Draw PCA plot from featureCounts output based on log2 transformed expression values (Bonus)
+
+library(ggplot2)
+library(ggforce)
+
+1. Uploading featureCounts output into R environment
+
+featureCounts_output <- read.table("featureCounts_output.txt", row.names = 1)
+
+2. Assign samples names to columns
+
+colnames(featureCounts_output) <- c("Ctr3_1", "Ctr3_2", "Ctr3_3", "Ctr3_4",
+                                   "Dnmt1_1", "Dnmt1_2", "Dnmt1_3", "Dnmt1_4",
+                                   "Kmt2a_1", "Kmt2a_2", "Kmt2a_3", "Kmt2a_4")
+
+3. Filter genes with less than 1 read
+
+min_read <- 1
+
+filtered_expression_data <-featureCounts_output[apply(featureCounts_output,1,function(x){max(x)}) > min_read,]
+
+4. Making expression matrix as numeric
+
+filtered_expression_data <- apply(filtered_expression_data, 2, as.numeric)
+
+5. log2 transformation of expression values with rlog() function
+
+filtered_expression_data <- rlog(filtered_expression_data)
+
+6. Draw PCA plot based on log2 transformed expression matrix
+
+pdf("PCA_plot_based_on_log2_transformed_expression_values.pdf")
+
+pca_data=prcomp(t(filtered_expression_data))
+pca_data_perc=round(100*pca_data$sdev^2/sum(pca_data$sdev^2),1)
+df_pca_data = data.frame(PC1 = pca_data$x[,1], PC2 = pca_data$x[,2], sample = colnames(filtered_expression_data),
+                         Samples = c("Ctr3_1", "Ctr3_2", "Ctr3_3", "Ctr3_4",
+                                     "Dnmt1_1", "Dnmt1_2", "Dnmt1_3", "Dnmt1_4",
+                                     "Kmt2a_1", "Kmt2a_2", "Kmt2a_3", "Kmt2a_4"))
+
+ggplot(df_pca_data, aes(PC1,PC2, color = Samples,label=row.names(df_pca_data))) +
+  geom_point(size=8)+ labs(x=paste0("PC1 (",pca_data_perc[1],")"), y=paste0("PC2 (",pca_data_perc[2],")")) +
+  geom_text(nudge_x = 0.5, nudge_y = 0.5, size = 5) + theme_classic()
+
+dev.off()
+
+------------------------------------------------------------------------------------------------------
+
 If you desire more detailed workflow, can visit https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html website.
 
 If you have any questions about this pipeline, you feel free to contact me via kao25@hi.is e-mail address.
