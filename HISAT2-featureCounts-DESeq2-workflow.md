@@ -89,6 +89,9 @@ All transcripts belonging to each gene are quantified across samples by using th
 
 ~$ featureCounts control1.bam control2.bam patient1.bam patient2.bam -a annotation_file.gtf -o names_of_output_file -g gene_id -T 6 -s 2 -Q 50 --verbose
 
+Length column in output of featureCounts is number of bases of all exons of a gene of interest!
+This column could be considered in CPM-level normalization to taking account gene lenght in differential expression analysis!
+
 ------------------------------------------------------------------------------------------------------
 
 The meaning of arguments:
