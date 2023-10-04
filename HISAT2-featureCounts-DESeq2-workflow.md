@@ -209,6 +209,8 @@ library(ggforce)
 
 featureCounts_output <- read.table("featureCounts_output.txt", row.names = 1)
 
+------------------------------------------------------------------------------------------------------
+
 #### 2. Assign samples names to columns
 
 colnames(featureCounts_output) <- c("Ctr3_1", "Ctr3_2", "Ctr3_3", "Ctr3_4",
