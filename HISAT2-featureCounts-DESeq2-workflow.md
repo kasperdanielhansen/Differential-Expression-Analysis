@@ -476,7 +476,7 @@ write.csv(DEGs, "/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_out
 
 setwd("/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis")
 
-MA_plot <- glimmaMA(dds)
+MA_plot <- glimmaMA(dds, status.cols = c("#d95f02", "silver", "#7570b3"))
 
 #### Save the MA plot as an HTML file
 
