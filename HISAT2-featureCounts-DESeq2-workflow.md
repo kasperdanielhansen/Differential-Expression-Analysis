@@ -202,14 +202,14 @@ Obtained file with .csv extension looks like below:
 
 # Draw PCA plot from featureCounts output based on log2 transformed expression values (1)
 
+------------------------------------------------------------------------------------------------------
+
 library(ggplot2)  
 library(ggforce)
 
 #### 1. Uploading featureCounts output into R environment
 
 featureCounts_output <- read.table("featureCounts_output.txt", row.names = 1)
-
-------------------------------------------------------------------------------------------------------
 
 #### 2. Assign samples names to columns
 
