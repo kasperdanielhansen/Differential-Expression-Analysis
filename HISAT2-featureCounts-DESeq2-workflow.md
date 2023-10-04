@@ -526,7 +526,7 @@ EnhancedVolcano(DE_results,
                 title = "Dnmt1 DEGs", 
                 FCcutoff = 1,
                 pCutoff = 5e-2, # padj < 0.05
-                col = c("grey", "#d95f02", "#1b9e77", "#7570b3"),
+                col = c("#808080", "#d95f02", "#1b9e77", "#7570b3"),
                 colAlpha = 2,
                 drawConnectors = TRUE,
                 widthConnectors = 0.5,
