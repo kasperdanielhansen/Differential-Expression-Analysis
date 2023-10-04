@@ -476,7 +476,7 @@ write.csv(DEGs, "/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_out
 
 setwd("/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis")
 
-MA_plot <- glimmaMA(dds, status.cols = c("#d95f02", "silver", "#7570b3"))
+MA_plot <- glimmaMA(dds)
 
 #### Save the MA plot as an HTML file
 
@@ -526,7 +526,7 @@ EnhancedVolcano(DE_results,
                 title = "Dnmt1 DEGs", 
                 FCcutoff = 1,
                 pCutoff = 5e-2, # padj < 0.05
-                col = c("#808080", "#d95f02", "#1b9e77", "#7570b3"),
+                col = c("#808080", "#d95f02", "#cab2d6", "#7570b3"),
                 colAlpha = 2,
                 drawConnectors = TRUE,
                 widthConnectors = 0.5,
