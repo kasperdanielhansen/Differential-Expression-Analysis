@@ -253,7 +253,7 @@ dev.off()
 library(edgeR)
 library(ggplot2)
 
-1. Uploading expression matrix (output of featureCounts)
+## 1. Uploading expression matrix (output of featureCounts)
 
 expression_matrix <- read.table("Ctr3_Kmt2a_Dnmt1_featureCounts_gene_level_quantification", row.names = 1, header = T)
 
