@@ -296,6 +296,8 @@ filtered_expression_data <- CPM_normalized_expression_values[apply(CPM_normalize
 
 log2_transformed_filtered_expression_data <- log2(filtered_expression_data + 1)
 
+#### 9. Draw a PCA plot and save it as pdf file
+
 pdf("/home/ko/Documents/ONT_data/Kmt2a_results/Our_Kmt2a_bulk_RNA_seq_data_results/after_removal_of_pup1_DE_analysis/PCA_plot_based_on_log2_+1_transformed_CPM_expression_values.pdf")
 
 pca_data=prcomp(t(log2_transformed_filtered_expression_data))
