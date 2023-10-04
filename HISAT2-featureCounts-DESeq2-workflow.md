@@ -250,7 +250,7 @@ dev.off()
 
 ------------------------------------------------------------------------------------------------------
 
-# Draw PCA plot from featureCounts output based on log2 transformed expression values (2)
+# Draw PCA plot from featureCounts output based on log2 transformed CPM values (2)
 
 library(edgeR)  
 library(ggplot2)
