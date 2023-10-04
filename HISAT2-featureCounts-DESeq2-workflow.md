@@ -200,7 +200,7 @@ Obtained file with .csv extension looks like below:
 
 ------------------------------------------------------------------------------------------------------
 
-# Draw PCA plot from featureCounts output based on log2 transformed expression values (Bonus)
+# Draw PCA plot from featureCounts output based on log2 transformed expression values (1)
 
 library(ggplot2)  
 library(ggforce)
@@ -243,6 +243,64 @@ df_pca_data = data.frame(PC1 = pca_data$x[,1], PC2 = pca_data$x[,2], sample = co
 ggplot(df_pca_data, aes(PC1,PC2, color = Samples,label=row.names(df_pca_data))) +
   geom_point(size=8)+ labs(x=paste0("PC1 (",pca_data_perc[1],")"), y=paste0("PC2 (",pca_data_perc[2],")")) +
   geom_text(nudge_x = 0.5, nudge_y = 0.5, size = 5) + theme_classic()
+
+dev.off()
+
+------------------------------------------------------------------------------------------------------
+
+# Draw PCA plot from featureCounts output based on log2 transformed expression values (2)
+
+library(edgeR)
+library(ggplot2)
+
+1. Uploading expression matrix (output of featureCounts)
+
+expression_matrix <- read.table("Ctr3_Kmt2a_Dnmt1_featureCounts_gene_level_quantification", row.names = 1, header = T)
+
+2. Save gene length (this is number of bases of all exons in each gene) as a vector. Gene length will be used in CPM normalization
+
+gene_length <- expression_matrix$Length
+
+3. Keep columns where there are samples
+
+expression_matrix <- expression_matrix[, -c(1:5)]
+
+4. Create a vector containing library size of all samples which will be used in CPM normalization. Library size is total number of reads of all genes in the sample of interest
+
+library_size <- colSums(expression_matrix)
+
+5. Create a meta data annotating samples in the expression matrix respect to column order of samples
+
+group <- factor(c("Control", "Control", "Control",
+                  "Control", "Dnmt1", "Dnmt1",
+                  "Dnmt1", "Dnmt1", "Kmt2a",
+                  "Kmt2a", "Kmt2a", "Kmt2a"))
+
+group <- relevel(group, "Control")
+
+6. Do CPM normalization in the expression matrix through cpm() function of the R package edgeR
+
+CPM_normalized_expression_values <- cpm(expression_matrix,
+                                        lib.size = library_size,
+                                        gene.length = gene_length,
+                                        group = group)
+7. Keep genes with CPM > 1
+
+CPM_cutoff <- 1
+
+filtered_expression_data <- CPM_normalized_expression_values[apply(CPM_normalized_expression_values,1,function(x){max(x)}) > CPM_cutoff, ]
+
+log2_transformed_filtered_expression_data <- log2(filtered_expression_data + 1)
+
+pdf("/home/ko/Documents/ONT_data/Kmt2a_results/Our_Kmt2a_bulk_RNA_seq_data_results/after_removal_of_pup1_DE_analysis/PCA_plot_based_on_log2_+1_transformed_CPM_expression_values.pdf")
+
+pca_data=prcomp(t(log2_transformed_filtered_expression_data))
+
+pca_data_perc=round(100*pca_data$sdev^2/sum(pca_data$sdev^2),1)
+
+df_pca_data = data.frame(PC1 = pca_data$x[,1], PC2 = pca_data$x[,2], sample = colnames(log2_transformed_filtered_expression_data), Samples = c("Ctr3_1", "Ctr3_2", "Ctr3_3", "Ctr3_4", "Dnmt1_1", "Dnmt1_2", "Dnmt1_3", "Dnmt1_4", "Kmt2a_1", "Kmt2a_2", "Kmt2a_3", "Kmt2a_4"))
+
+ggplot(df_pca_data, aes(PC1,PC2, color = Samples,label=row.names(df_pca_data))) + geom_point(size=8)+ labs(x=paste0("PC1 (",pca_data_perc[1],")"), y=paste0("PC2 (",pca_data_perc[2],")")) + geom_text(nudge_x = 0.5, nudge_y = 0.5, size = 5) + theme_classic()
 
 dev.off()
 
