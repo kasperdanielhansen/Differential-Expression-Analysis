@@ -205,31 +205,31 @@ Obtained file with .csv extension looks like below:
 library(ggplot2)  
 library(ggforce)
 
-1. Uploading featureCounts output into R environment
+#### 1. Uploading featureCounts output into R environment
 
 featureCounts_output <- read.table("featureCounts_output.txt", row.names = 1)
 
-2. Assign samples names to columns
+#### 2. Assign samples names to columns
 
 colnames(featureCounts_output) <- c("Ctr3_1", "Ctr3_2", "Ctr3_3", "Ctr3_4",
                                    "Dnmt1_1", "Dnmt1_2", "Dnmt1_3", "Dnmt1_4",
                                    "Kmt2a_1", "Kmt2a_2", "Kmt2a_3", "Kmt2a_4")
 
-3. Filter genes with less than 1 read
+#### 3. Filter genes with less than 1 read
 
 min_read <- 1
 
 filtered_expression_data <-featureCounts_output[apply(featureCounts_output,1,function(x){max(x)}) > min_read,]
 
-4. Making expression matrix as numeric
+#### 4. Making expression matrix as numeric
 
 filtered_expression_data <- apply(filtered_expression_data, 2, as.numeric)
 
-5. log2 transformation of expression values with rlog() function
+#### 5. log2 transformation of expression values with rlog() function
 
 filtered_expression_data <- rlog(filtered_expression_data)
 
-6. Draw PCA plot based on log2 transformed expression matrix
+#### 6. Draw PCA plot based on log2 transformed expression matrix
 
 pdf("PCA_plot_based_on_log2_transformed_expression_values.pdf")
 
@@ -253,23 +253,23 @@ dev.off()
 library(edgeR)
 library(ggplot2)
 
-#### 1. Uploading expression matrix (output of featureCounts)
+#### 1. Uploading expression matrix into R environment (output of featureCounts)
 
 expression_matrix <- read.table("Ctr3_Kmt2a_Dnmt1_featureCounts_gene_level_quantification", row.names = 1, header = T)
 
-2. Save gene length (this is number of bases of all exons in each gene) as a vector. Gene length will be used in CPM normalization
+#### 2. Save gene length (this is number of bases of all exons in each gene) as a vector. Gene length will be used in CPM normalization
 
 gene_length <- expression_matrix$Length
 
-3. Keep columns where there are samples
+#### 3. Keep columns where there are samples
 
 expression_matrix <- expression_matrix[, -c(1:5)]
 
-4. Create a vector containing library size of all samples which will be used in CPM normalization. Library size is total number of reads of all genes in the sample of interest
+#### 4. Create a vector containing library size of all samples which will be used in CPM normalization. Library size is total number of reads of all genes in the sample of interest
 
 library_size <- colSums(expression_matrix)
 
-5. Create a meta data annotating samples in the expression matrix respect to column order of samples
+#### 5. Create a meta data annotating samples in the expression matrix respect to column order of samples
 
 group <- factor(c("Control", "Control", "Control",
                   "Control", "Dnmt1", "Dnmt1",
@@ -278,13 +278,13 @@ group <- factor(c("Control", "Control", "Control",
 
 group <- relevel(group, "Control")
 
-6. Do CPM normalization in the expression matrix through cpm() function of the R package edgeR
+#### 6. Do CPM normalization in the expression matrix through cpm() function of the R package edgeR
 
 CPM_normalized_expression_values <- cpm(expression_matrix,
                                         lib.size = library_size,
                                         gene.length = gene_length,
                                         group = group)
-7. Keep genes with CPM > 1
+#### 7. Keep genes with CPM > 1
 
 CPM_cutoff <- 1
 
