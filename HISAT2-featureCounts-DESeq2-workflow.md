@@ -253,7 +253,6 @@ dev.off()
 # Draw PCA plot from featureCounts output based on log2 transformed expression values (2)
 
 library(edgeR)
-
 library(ggplot2)
 
 #### 1. Uploading expression matrix into R environment (output of featureCounts)
