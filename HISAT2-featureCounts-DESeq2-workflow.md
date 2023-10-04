@@ -311,6 +311,210 @@ ggplot(df_pca_data, aes(PC1,PC2, color = Samples,label=row.names(df_pca_data))) 
 dev.off()
 
 ------------------------------------------------------------------------------------------------------
+# CPM-level normalization based differential expression analysis with DESeq2
+
+#### Dnmt1 RNA-seq analysis
+
+#### Uploading libraries
+
+library(DESeq2)
+library(pheatmap)
+library(edgeR)
+library(Glimma)
+library(ggplot2)
+library(EnhancedVolcano)
+
+#### Uploading expression matrix which is output of the featureCounts
+
+expression_matrix <- read.delim("/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/Ctr3_Kmt2a_Dnmt1_featureCounts_gene_level_quantification_modified",
+                                header = T, row.names = 1)
+
+#### There are 25,239 genes in the expression matrix in total
+
+#### Keep only protein-coding genes:
+
+#### Get gene types from NCBI
+#### NCBI > Gene > Download/FTP > DATA > gene_info.gz
+#### Download from: "https://ftp.ncbi.nih.gov/gene/DATA/gene_info.gz"
+#### Note that this file contains info for all genes/species
+#### Taxanomy ID of Mus musculus is 10090
+#### Taxanomy ID of Homo sapiens is 9606
+
+protein_coding_genes <- fread("/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/mouse_protein_coding_genes.txt")
+
+#### There are 20,585 mouse protein-coding genes in total!
+#### Protein-coding gene list obtained from NCBI! Check CpG-density calculation
+#### pipeline on my GitHub!
+
+expression_matrix_of_protein_coding_genes <- subset(expression_matrix,
+                                                    rownames(expression_matrix) %in%
+                                                    protein_coding_genes$protein_coding_genes)
+
+write.csv(expression_matrix_of_protein_coding_genes, "/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis/unfiltered_expression_matrix_of_protein_coding_genes.csv", quote = F, row.names = T)
+
+#### 19,135 out of 25,239 (75.81%) genes are protein-coding genes
+
+#### Keep only Dnmt1 and control samples
+
+expression_matrix_of_protein_coding_genes <- expression_matrix_of_protein_coding_genes[,c(7:9, 11:13)]
+head(expression_matrix_of_protein_coding_genes)
+
+#### Keep gene length for CPM-level normalization
+
+gene_length <- expression_matrix_of_protein_coding_genes$Length
+
+#### Create a vector containing library size of all samples which will be used in CPM normalization. 
+#### Library size is total number of reads of all genes in the sample of interest
+
+library_size <- colSums(expression_matrix_of_protein_coding_genes)
+head(library_size)
+
+#### Create a meta data annotating samples in the expression matrix respect to column order of samples
+
+group <- factor(c("Control", "Control", "Control", "Dnmt1", "Dnmt1", "Dnmt1"))
+
+group <- relevel(group, "Control")
+
+#### Do CPM normalization in the expression matrix through cpm() function of the R package edgeR
+
+CPM_normalized_expression_values <- cpm(expression_matrix_of_protein_coding_genes, lib.size = library_size, gene.length = gene_length, group = group)
+head(CPM_normalized_expression_values)
+nrow(CPM_normalized_expression_values)
+
+write.csv(CPM_normalized_expression_values, "/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis/unfiltered_CPM_normalized_expression_values.csv", quote = F, row.names = T)
+
+#### Keep genes with CPM > 1
+#### Row-wise filtration is performed in expression data to eliminate genes with low expression across samples. 
+#### Low expressed genes may cause statistical noise and create a bias in results.
+                                  
+CPM_cutoff <- 1
+                                
+filtered_expression_data <- CPM_normalized_expression_values[apply(CPM_normalized_expression_values,1,function(x){max(x)}) > CPM_cutoff,]
+nrow(filtered_expression_data)
+
+write.csv(filtered_expression_data, "/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis/filtered_CPM_normalized_expression_values.csv", quote = F, row.names = T)
+
+#### 12,529 out of 19,135 genes are left after CPM-level filtering
+
+#### PCA plot
+
+log2_transformed_of_expression_values <- log2(filtered_expression_data + 1)
+
+write.csv(log2_transformed_of_expression_values, "/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis/log2_transformed_CPM_values_for_PCA_plot.csv", quote = F, row.names = T)
+
+pdf("/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis/PCA_plot_based_on_log2_+1_transformed_CPM_expression_values.pdf")
+
+pca_data=prcomp(t(log2_transformed_of_expression_values))
+
+pca_data_perc=round(100*pca_data$sdev^2/sum(pca_data$sdev^2),1)
+
+df_pca_data = data.frame(PC1 = pca_data$x[,1], PC2 = pca_data$x[,2], sample = colnames(log2_transformed_of_expression_values), Samples = c("Ctr3_2", "Ctr3_3", "Ctr3_4", "Dnmt1_2", "Dnmt1_3", "Dnmt1_4"))
+
+ggplot(df_pca_data, aes(PC1,PC2, color = Samples,label=row.names(df_pca_data))) + geom_point(size=8)+ labs(x=paste0("PC1 (",pca_data_perc[1],")"), y=paste0("PC2 (",pca_data_perc[2],")")) + geom_text(nudge_x = 0.5, nudge_y = 0.5, size = 5) + theme_classic()
+
+dev.off()
+
+#### Obtain raw expression values of genes that passed CPM-level filtering
+
+filtered_expression_data_2 <- subset(expression_matrix_of_protein_coding_genes, rownames(expression_matrix_of_protein_coding_genes) %in% rownames(filtered_expression_data))
+nrow(filtered_expression_data_2)
+head(filtered_expression_data_2)
+
+write.csv(filtered_expression_data_2, "/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis/input_for_DE_analysis_raw_expression_values.csv", quote = F, row.names = T)
+
+#### Sample-trait annotation
+
+sampleInfo <- data.frame(group,row.names=colnames(filtered_expression_data_2))
+head(sampleInfo)
+
+#### Differential expression analysis:
+
+dds <- DESeqDataSetFromMatrix(countData = filtered_expression_data_2, colData = sampleInfo, design = ~ group)
+
+dds$group = relevel(dds$group, "Control")
+
+dds <- DESeq(dds)
+DE_results <- results(dds)
+
+write.csv(DE_results, "/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis/all_results_without_any_filtering.csv", quote = F, row.names = T)
+
+#### Find DEGs with less than adjusted pvalue 0.05
+
+DEGs <- subset(DE_results, DE_results$padj < 0.05)
+
+write.csv(DEGs, "/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis/DEGs_with_adjusted_pvalue_0.05_cutoff.csv", quote = F, row.names = T)
+
+#### 2,434 genes are differentially expressed
+
+#### MA plot
+
+setwd("/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis")
+
+MA_plot <- glimmaMA(dds)
+
+#### Save the MA plot as an HTML file
+
+saveWidget(MA_plot, file = "MA_plot.html")
+
+#### Density plot of non-adjusted pvalues
+
+pdf("/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis/pvalue_distribution_of_all_non_DEGs_and_all_DEGs_genes.pdf")
+hist(DE_results$pvalue)
+dev.off()
+
+#### Heatmap for all DEGs with their log2 transformed CPM values
+
+log2_CPM_values_of_DEGs <- subset(log2_transformed_of_expression_values,
+                                  rownames(log2_transformed_of_expression_values) %in%
+                                    rownames(DEGs))
+
+pdf("/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis/Heatmap_of_DEGs_log2_transformed_CPM_values.pdf")
+pheatmap(log2_CPM_values_of_DEGs, scale = "row", show_rownames = F, color=colorRampPalette(c("navy", "gray90", "red"))(50),
+         cellwidth = 30, cellheight = 0.14)
+dev.off()
+
+#### Draw a PCA plot based on log2 transformed CPM values of DEGs
+
+pdf("/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis/PCA_plot_based_on_log2_+1_transformed_CPM_expression_values_of_DEGs.pdf")
+
+pca_data=prcomp(t(log2_CPM_values_of_DEGs))
+
+pca_data_perc=round(100*pca_data$sdev^2/sum(pca_data$sdev^2),1)
+
+df_pca_data = data.frame(PC1 = pca_data$x[,1], PC2 = pca_data$x[,2], sample = colnames(log2_CPM_values_of_DEGs), Samples = c("Ctr3_2", "Ctr3_3", "Ctr3_4", "Dnmt1_2", "Dnmt1_3", "Dnmt1_4"))
+
+ggplot(df_pca_data, aes(PC1,PC2, color = Samples,label=row.names(df_pca_data))) + geom_point(size=8)+ labs(x=paste0("PC1 (",pca_data_perc[1],")"), y=paste0("PC2 (",pca_data_perc[2],")")) + geom_text(nudge_x = 0.5, nudge_y = 0.5, size = 5) + theme_classic()
+
+dev.off()
+
+#### Label Trim59 and Armcx6 on volcano plot
+#### FC cutoff is 1, adj pvalue cutoff is 0.05 (i.e., 5e-2)
+
+pdf("/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis/Volcano_plot_of_Armcx6_&_Trim59.pdf")
+
+EnhancedVolcano(DE_results,
+                lab = rownames(DE_results),
+                x = 'log2FoldChange',
+                y = 'padj',
+                ylab = bquote(~ -Log[10]~ 'adj pvalue'),
+                title = "Dnmt1 DEGs", 
+                FCcutoff = 1,
+                pCutoff = 5e-2, # padj < 0.05
+                col = c("grey", "#d95f02", "#1b9e77", "#7570b3"),
+                colAlpha = 2,
+                drawConnectors = TRUE,
+                widthConnectors = 0.5,
+                colConnectors = 'red',
+                labSize = 6.0,
+                labCol = 'black',
+                labFace = 'bold',
+                boxedLabels = TRUE,
+                selectLab = c("Trim59",
+                              "Armcx6"))
+
+dev.off()
+
+------------------------------------------------------------------------------------------------------
 
 If you desire more detailed workflow, can visit https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html website.
 
