@@ -317,11 +317,11 @@ dev.off()
 
 #### Uploading libraries
 
-library(DESeq2)
-library(pheatmap)
-library(edgeR)
-library(Glimma)
-library(ggplot2)
+library(DESeq2)  
+library(pheatmap)  
+library(edgeR)  
+library(Glimma)  
+library(ggplot2)  
 library(EnhancedVolcano)
 
 #### Uploading expression matrix which is output of the featureCounts
