@@ -329,6 +329,20 @@ library(ggplot2)
 
 library(EnhancedVolcano)
 
+library("BSgenome.Mmusculus.UCSC.mm10")  
+
+library("TxDb.Mmusculus.UCSC.mm10.knownGene")  
+
+library("TxDb.Mmusculus.UCSC.mm10.ensGene")  
+
+library("GenomicFeatures")  
+
+library("data.table")  
+
+library("stringr")  
+
+library("org.Mm.eg.db")
+
 #### Uploading expression matrix which is output of the featureCounts
 
 expression_matrix <- read.delim("/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/Ctr3_Kmt2a_Dnmt1_featureCounts_gene_level_quantification_modified",
@@ -344,6 +358,13 @@ expression_matrix <- read.delim("/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/afte
 #### Note that this file contains info for all genes/species
 #### Taxanomy ID of Mus musculus is 10090
 #### Taxanomy ID of Homo sapiens is 9606
+
+gene_info <- read.delim("/media/ko/New Volume/Documents/Calculate_CpG_density_of_genes/gene_info")
+
+gene_info_Mus_musculus <- subset(gene_info, gene_info$X.tax_id == "10090")
+gene_info_Mus_musculus_protein_coding_genes <- subset(gene_info_Mus_musculus, gene_info_Mus_musculus$type_of_gene == "protein-coding")
+
+# In NCBI, there is 26340 Mus musculus protein-coding genes!
 
 protein_coding_genes <- fread("/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/mouse_protein_coding_genes.txt")
 
