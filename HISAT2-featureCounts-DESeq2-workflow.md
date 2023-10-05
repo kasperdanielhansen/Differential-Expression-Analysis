@@ -317,11 +317,16 @@ dev.off()
 
 #### Uploading libraries
 
-library(DESeq2)
-library(pheatmap)
-library(edgeR)
-library(Glimma)
-library(ggplot2)
+library(DESeq2)  
+
+library(pheatmap)  
+
+library(edgeR)  
+
+library(Glimma)  
+
+library(ggplot2)  
+
 library(EnhancedVolcano)
 
 #### Uploading expression matrix which is output of the featureCounts
@@ -359,13 +364,15 @@ gene_length <- expression_matrix_of_protein_coding_genes$Length
 
 #### Keep only Dnmt1 and control samples
 
-expression_matrix_of_protein_coding_genes <- expression_matrix_of_protein_coding_genes[,c(7:9, 11:13)]
+expression_matrix_of_protein_coding_genes <- expression_matrix_of_protein_coding_genes[,c(7:9, 11:13)]  
+
 head(expression_matrix_of_protein_coding_genes)
 
 #### Create a vector containing library size of all samples which will be used in CPM normalization. 
 #### Library size is total number of reads of all genes in the sample of interest
 
-library_size <- colSums(expression_matrix_of_protein_coding_genes)
+library_size <- colSums(expression_matrix_of_protein_coding_genes)  
+
 head(library_size)
 
 #### Create a meta data annotating samples in the expression matrix respect to column order of samples
@@ -376,8 +383,10 @@ group <- relevel(group, "Control")
 
 #### Do CPM normalization in the expression matrix through cpm() function of the R package edgeR
 
-CPM_normalized_expression_values <- cpm(expression_matrix_of_protein_coding_genes, lib.size = library_size, gene.length = gene_length, group = group)
-head(CPM_normalized_expression_values)
+CPM_normalized_expression_values <- cpm(expression_matrix_of_protein_coding_genes, lib.size = library_size, gene.length = gene_length, group = group)  
+
+head(CPM_normalized_expression_values)  
+
 nrow(CPM_normalized_expression_values)
 
 write.csv(CPM_normalized_expression_values, "/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis/unfiltered_CPM_normalized_expression_values.csv", quote = F, row.names = T)
@@ -415,15 +424,18 @@ dev.off()
 
 #### Obtain raw expression values of genes that passed CPM-level filtering
 
-filtered_expression_data_2 <- subset(expression_matrix_of_protein_coding_genes, rownames(expression_matrix_of_protein_coding_genes) %in% rownames(filtered_expression_data))
-nrow(filtered_expression_data_2)
-head(filtered_expression_data_2)
+filtered_expression_data_2 <- subset(expression_matrix_of_protein_coding_genes, rownames(expression_matrix_of_protein_coding_genes) %in% rownames(filtered_expression_data))  
+
+nrow(filtered_expression_data_2)  
+
+head(filtered_expression_data_2)  
 
 write.csv(filtered_expression_data_2, "/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis/input_for_DE_analysis_raw_expression_values.csv", quote = F, row.names = T)
 
 #### Sample-trait annotation
 
-sampleInfo <- data.frame(group,row.names=colnames(filtered_expression_data_2))
+sampleInfo <- data.frame(group,row.names=colnames(filtered_expression_data_2))  
+
 head(sampleInfo)
 
 #### Differential expression analysis:
@@ -432,14 +444,16 @@ dds <- DESeqDataSetFromMatrix(countData = filtered_expression_data_2, colData = 
 
 dds$group = relevel(dds$group, "Control")
 
-dds <- DESeq(dds)
+dds <- DESeq(dds)  
+
 DE_results <- results(dds)
 
 write.csv(DE_results, "/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis/all_results_without_any_filtering.csv", quote = F, row.names = T)
 
 #### Find DEGs with less than adjusted pvalue 0.05
 
-DEGs <- subset(DE_results, DE_results$padj < 0.05)
+DEGs <- subset(DE_results, DE_results$padj < 0.05)  
+
 nrow(DEGs)
 
 write.csv(DEGs, "/home/ko/Documents/Dnmt1_Juan_RNA_seq_data/after_removal_of_outlier_pup1/CPM_normalization_based_analysis/DEGs_with_adjusted_pvalue_0.05_cutoff.csv", quote = F, row.names = T)
