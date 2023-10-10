@@ -125,10 +125,12 @@ After gene-level quantification, the expression matrix looks like below:
 
 After finishing of gene-level quantification, expression matrix is read in R statistical computing environment to carry out differential expression analysis steps. Differential expression workflow is shown below:
 
+```{r}
 featureCounts_expression_matrix=read.delim("featureCounts_expression_matrix", header = T, row.names = 1) # reading
 expression matrix in R.
 
 head(featureCounts_expression_matrix) # Looking at first six rows of expression matrix.
+```
 
 ------------------------------------------------------------------------------------------------------
 
